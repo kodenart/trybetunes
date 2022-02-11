@@ -1,11 +1,17 @@
 import React, { Component } from 'react';
 import Header from '../components/Header';
+import LoadingMessage from '../components/LoadingMessage';
+import SearchForm from '../components/SearchForm';
+import searchAlbumsAPI from '../services/searchAlbumsAPI';
 
 export default class Search extends Component {
   constructor() {
     super();
     this.state = {
       searchInput: '',
+      loading: false,
+      searched: false,
+      albumList: [],
     };
   }
 
@@ -13,26 +19,29 @@ export default class Search extends Component {
     this.setState({ searchInput: target.value });
   }
 
-  render() {
+  searchAlbumsBtn = async () => {
     const { searchInput } = this.state;
-    const arbValueBtn = 2;
+    this.setState({ loading: true });
+    const albumArr = await searchAlbumsAPI(searchInput);
+    this.setState({ albumList: albumArr, loading: false, searched: true });
+  }
+
+  render() {
+    const { searchInput, loading, searched, albumList } = this.state;
     return (
       <div data-testid="page-search">
         <Header />
-        <input
-          type="text"
-          value={ searchInput }
-          onChange={ this.updateSI }
-          data-testid="search-artist-input"
-        />
-        <button
-          type="button"
-          disabled={ searchInput.length < arbValueBtn }
-          data-testid="search-artist-button"
-        >
-          Buscar
-
-        </button>
+        {loading
+          ? <LoadingMessage />
+          : (
+            <SearchForm
+              searchInput={ searchInput }
+              searched={ searched }
+              albumList={ albumList }
+              updateSI={ this.updateSI }
+              searchAlbumsBtn={ this.searchAlbumsBtn }
+            />
+          )}
       </div>
     );
   }
