@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router';
+import PropTypes from 'prop-types';
 import LoadingMessage from '../components/LoadingMessage';
 import { createUser } from '../services/userAPI';
 
@@ -9,7 +9,6 @@ export default class Login extends Component {
     this.state = {
       nameInput: '',
       loading: false,
-      redirect: false,
     };
   }
 
@@ -18,18 +17,18 @@ export default class Login extends Component {
   }
 
   handleLoginButton = async () => {
+    const { logIn } = this.props;
     const { nameInput } = this.state;
     this.setState({ loading: true });
     await createUser({ name: nameInput });
-    this.setState({ loading: false, redirect: true });
+    logIn();
   }
 
   render() {
-    const { nameInput, loading, redirect } = this.state;
+    const { nameInput, loading } = this.state;
     const minLenghtUsername = 3;
     return (
       <div data-testid="page-login">
-        {redirect ? <Redirect to="/search" /> : null}
         <input
           data-testid="login-name-input"
           value={ nameInput }
@@ -50,3 +49,7 @@ export default class Login extends Component {
     );
   }
 }
+
+Login.propTypes = {
+  logIn: PropTypes.func.isRequired,
+};
