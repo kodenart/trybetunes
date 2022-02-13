@@ -5,7 +5,13 @@ import AlbumCard from './AlbumCard';
 
 export default class SearchForm extends Component {
   render() {
-    const { searchInput, searched, albumList, updateSI, searchAlbumsBtn } = this.props;
+    const { searchInput,
+      searched,
+      albumList,
+      updateSI,
+      searchAlbumsBtn,
+      searchedStr } = this.props;
+
     const arbValueBtn = 2;
     return (
       <div>
@@ -29,12 +35,12 @@ export default class SearchForm extends Component {
         </div>
         <div className="albumList">
 
-          {albumList.length > 0
+          {albumList.length
             ? (
               <p>
                 Resultado de álbuns de:
                 {' '}
-                {albumList[0].artistName}
+                {searchedStr}
               </p>
             )
             : null}
@@ -65,6 +71,7 @@ export default class SearchForm extends Component {
 
 SearchForm.propTypes = {
   searchInput: PropTypes.string.isRequired,
+  searchedStr: PropTypes.string.isRequired,
   updateSI: PropTypes.func.isRequired,
   searched: PropTypes.bool.isRequired,
   albumList: PropTypes.arrayOf(PropTypes.object).isRequired,

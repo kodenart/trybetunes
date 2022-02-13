@@ -12,6 +12,7 @@ export default class Search extends Component {
       loading: false,
       searched: false,
       albumList: [],
+      searchedStr: '',
     };
   }
 
@@ -23,11 +24,15 @@ export default class Search extends Component {
     const { searchInput } = this.state;
     this.setState({ loading: true });
     const albumArr = await searchAlbumsAPI(searchInput);
-    this.setState({ albumList: albumArr, loading: false, searched: true });
+    this.setState({ albumList: albumArr,
+      loading: false,
+      searched: true,
+      searchedStr: searchInput,
+      searchInput: '' });
   }
 
   render() {
-    const { searchInput, loading, searched, albumList } = this.state;
+    const { searchInput, loading, searched, albumList, searchedStr } = this.state;
     return (
       <div data-testid="page-search">
         <Header />
@@ -35,6 +40,7 @@ export default class Search extends Component {
           ? <LoadingMessage />
           : (
             <SearchForm
+              searchedStr={ searchedStr }
               searchInput={ searchInput }
               searched={ searched }
               albumList={ albumList }
