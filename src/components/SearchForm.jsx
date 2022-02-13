@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
+import AlbumCard from './AlbumCard';
 
 export default class SearchForm extends Component {
   render() {
@@ -24,6 +26,37 @@ export default class SearchForm extends Component {
           >
             Buscar
           </button>
+        </div>
+        <div className="albumList">
+
+          {albumList.length > 0
+            ? (
+              <p>
+                Resultado de álbuns de:
+                {' '}
+                {albumList[0].artistName}
+              </p>
+            )
+            : null}
+
+          {searched
+            ? albumList.map((album) => (
+              <Link
+                data-testid={ `link-to-album-${album.collectionId}` }
+                key={ album.collectionId }
+                to={ `/album/${album.collectionId}` }
+              >
+                <AlbumCard
+                  key={ album.collectionId }
+                  collectionName={ album.collectionName }
+                  artistName={ album.artistName }
+                  artworkUrl100={ album.artworkUrl100 }
+                />
+              </Link>
+            ))
+            : null}
+
+          {searched && albumList.length === 0 ? <p>Nenhum álbum foi encontrado</p> : null}
         </div>
       </div>
     );
