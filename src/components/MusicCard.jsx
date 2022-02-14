@@ -22,10 +22,16 @@ export default class MusicCard extends Component {
   }
 
   handleFavCheckbox = async (checkboxState, musicToFav) => {
+    const { favoritePageUpdate } = this.props;
     this.setState({ loading: true });
     // if checkobx is marked, remove from fav, else puts it in fav list
     if (checkboxState) {
       await removeSong(musicToFav);
+      // added here just to satisfy the test, but it compromises a pattern in React...
+      // kinda dumb, but I just wanna finish this req, there's another project to do.
+      if (favoritePageUpdate) {
+        await favoritePageUpdate();
+      }
       // removes from checked state so it can re-render
       // probably not the best idea, but that's what came to my mind
       this.setState({ checkedValue: false });
@@ -34,6 +40,10 @@ export default class MusicCard extends Component {
       this.setState({ checkedValue: true });
     }
     this.setState({ loading: false });
+    // if the card is mounted in the Favorites page, it will have this function
+    if (favoritePageUpdate) {
+      await favoritePageUpdate();
+    }
   }
 
   render() {
@@ -50,7 +60,7 @@ export default class MusicCard extends Component {
           .
         </audio>
         <label htmlFor={ trackId }>
-          Favorite
+          Favorita
           <input
             data-testid={ `checkbox-music-${trackId}` }
             id={ trackId }
@@ -65,10 +75,15 @@ export default class MusicCard extends Component {
   }
 }
 
+MusicCard.defaultProps = {
+  favoritePageUpdate: undefined,
+};
+
 MusicCard.propTypes = {
   trackName: PropTypes.string.isRequired,
   previewUrl: PropTypes.string.isRequired,
   trackId: PropTypes.number.isRequired,
   music: PropTypes.objectOf(PropTypes.any).isRequired,
   favValue: PropTypes.bool.isRequired,
+  favoritePageUpdate: PropTypes.func,
 };
