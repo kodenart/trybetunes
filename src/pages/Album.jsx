@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import Header from '../components/Header';
 import MusicCard from '../components/MusicCard';
+import { getFavoriteSongs } from '../services/favoriteSongsAPI';
 import getMusics from '../services/musicsAPI';
 
 export default class Album extends Component {
@@ -11,6 +12,7 @@ export default class Album extends Component {
       artistName: '',
       collectionName: '',
       resMusics: [],
+      favoriteSongs: [],
     };
   }
 
@@ -28,10 +30,14 @@ export default class Album extends Component {
       // a partir do segundo índice, são as músicas
       const resMusics = response.slice(1);
       const { artistName, collectionName } = albumInfo;
+
+      const favoriteSongs = await getFavoriteSongs(id);
+
       this.setState({
         artistName,
         collectionName,
         resMusics,
+        favoriteSongs,
       });
     } catch (error) {
       throw error.message;
@@ -39,7 +45,7 @@ export default class Album extends Component {
   }
 
   render() {
-    const { artistName, collectionName, resMusics } = this.state;
+    const { artistName, collectionName, resMusics, favoriteSongs } = this.state;
     return (
       <div data-testid="page-album">
         <Header />
@@ -53,6 +59,9 @@ export default class Album extends Component {
               previewUrl={ music.previewUrl }
               trackId={ music.trackId }
               music={ music }
+              favValue={
+                favoriteSongs.some((favSong) => favSong.trackId === music.trackId)
+              }
             />))}
         </div>
       </div>

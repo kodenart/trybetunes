@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { addSong } from '../services/favoriteSongsAPI';
+import { addSong, removeSong } from '../services/favoriteSongsAPI';
 import LoadingMessage from './LoadingMessage';
 
 export default class MusicCard extends Component {
@@ -8,18 +8,37 @@ export default class MusicCard extends Component {
     super();
     this.state = {
       loading: false,
+      checkedValue: false,
     };
   }
 
-  handleFavCheckbox = async (musicToFav) => {
+  componentDidMount() {
+    // if the music has been fav before it will be alreaedy marked.
+    // the logic is that album.jsx is sending if the trackId of this instance has
+    // any ocurrence in the LocalStorage array
+    // something like that => (∃ component.trackId ∈ localStorage)
+    const { favValue } = this.props;
+    this.setState({ checkedValue: favValue });
+  }
+
+  handleFavCheckbox = async (checkboxState, musicToFav) => {
     this.setState({ loading: true });
-    await addSong(musicToFav);
+    // if checkobx is marked, remove from fav, else puts it in fav list
+    if (checkboxState) {
+      await removeSong(musicToFav);
+      // removes from checked state so it can re-render
+      // probably not the best idea, but that's what came to my mind
+      this.setState({ checkedValue: false });
+    } else {
+      await addSong(musicToFav);
+      this.setState({ checkedValue: true });
+    }
     this.setState({ loading: false });
   }
 
   render() {
     const { trackName, previewUrl, trackId, music } = this.props;
-    const { loading } = this.state;
+    const { loading, checkedValue } = this.state;
     return (
       <div>
         <p>{trackName}</p>
@@ -36,7 +55,8 @@ export default class MusicCard extends Component {
             data-testid={ `checkbox-music-${trackId}` }
             id={ trackId }
             type="checkbox"
-            onChange={ () => { this.handleFavCheckbox(music); } }
+            onChange={ () => { this.handleFavCheckbox(checkedValue, music); } }
+            checked={ checkedValue }
           />
         </label>
         {loading ? <LoadingMessage /> : null}
@@ -50,4 +70,5 @@ MusicCard.propTypes = {
   previewUrl: PropTypes.string.isRequired,
   trackId: PropTypes.number.isRequired,
   music: PropTypes.objectOf(PropTypes.any).isRequired,
+  favValue: PropTypes.bool.isRequired,
 };
